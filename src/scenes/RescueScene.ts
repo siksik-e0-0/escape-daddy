@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 
-const W = 960;
-const H = 540;
+const W = 480;
+const H = 854;
 
 export class RescueScene extends Phaser.Scene {
   constructor() {
@@ -16,7 +16,7 @@ export class RescueScene extends Phaser.Scene {
   }
 
   private makeStarfield(): void {
-    for (let i = 0; i < 60; i++) {
+    for (let i = 0; i < 80; i++) {
       const x = Phaser.Math.Between(0, W);
       const y = Phaser.Math.Between(0, H);
       const r = Phaser.Math.Between(1, 3);
@@ -33,15 +33,12 @@ export class RescueScene extends Phaser.Scene {
   }
 
   private playRescueSequence(): void {
-    // 아빠 캐릭터 등장
-    const dad = this.add.image(W / 2, H / 2 + 20, 'dad').setScale(2).setAlpha(0);
+    const dad = this.add.image(W / 2, H / 2 + 40, 'dad').setScale(2.5).setAlpha(0);
     this.tweens.add({ targets: dad, alpha: 1, duration: 800, delay: 200 });
 
-    // 밧줄 끊기 효과
     this.time.delayedCall(1000, () => {
       this.cameras.main.flash(300, 255, 200, 0);
 
-      // 빛 파동
       const ring = this.add.circle(W / 2, H / 2, 10, 0xffcc00, 0.8).setDepth(5);
       this.tweens.add({
         targets: ring,
@@ -52,67 +49,63 @@ export class RescueScene extends Phaser.Scene {
       });
     });
 
-    // 자유로워진 아빠
     this.time.delayedCall(1400, () => {
       dad.setTexture('dad');
       dad.setTint(0xffff88);
 
-      // 별 파티클 효과
-      for (let i = 0; i < 20; i++) {
-        const angle = (i / 20) * Math.PI * 2;
+      for (let i = 0; i < 24; i++) {
+        const angle = (i / 24) * Math.PI * 2;
         const star = this.add.star(
-          W / 2 + Math.cos(angle) * 80,
-          H / 2 + Math.sin(angle) * 60,
-          5, 4, 10,
+          W / 2 + Math.cos(angle) * 90,
+          H / 2 + Math.sin(angle) * 90,
+          5, 4, 12,
           0xffd700,
         ).setDepth(6);
         this.tweens.add({
           targets: star,
-          x: W / 2 + Math.cos(angle) * 200,
-          y: H / 2 + Math.sin(angle) * 150,
+          x: W / 2 + Math.cos(angle) * 220,
+          y: H / 2 + Math.sin(angle) * 220,
           alpha: 0,
           scale: 0,
-          duration: 800,
+          duration: 900,
           delay: i * 30,
           onComplete: () => star.destroy(),
         });
       }
     });
 
-    // 엔딩 텍스트
     this.time.delayedCall(2200, () => {
-      this.add.text(W / 2, 80, '🎉 아빠를 구했어요! 🎉', {
-        fontSize: '36px',
+      this.add.text(W / 2, 100, '🎉 아빠를\n구했어요! 🎉', {
+        fontSize: '34px',
         color: '#ffd700',
         stroke: '#000000',
         strokeThickness: 4,
         align: 'center',
-      }).setOrigin(0.5).setDepth(10);
-
-      this.add.text(W / 2, 150, '불꽃 돌풍 물약의 힘으로\n장벽을 부수고 아빠를 구했습니다!', {
-        fontSize: '20px',
-        color: '#ffffff',
-        align: 'center',
         lineSpacing: 8,
       }).setOrigin(0.5).setDepth(10);
 
-      // 트로피 효과
-      const trophy = this.add.text(W / 2, H / 2 + 120, '🏆', {
-        fontSize: '60px',
+      this.add.text(W / 2, 200, '불꽃 돌풍 물약의 힘으로\n장벽을 부수고\n아빠를 구했습니다!', {
+        fontSize: '18px',
+        color: '#ffffff',
+        align: 'center',
+        lineSpacing: 10,
+      }).setOrigin(0.5).setDepth(10);
+
+      const trophy = this.add.text(W / 2, H / 2 + 180, '🏆', {
+        fontSize: '70px',
       }).setOrigin(0.5).setDepth(10).setAlpha(0);
 
       this.tweens.add({
         targets: trophy,
         alpha: 1,
-        y: H / 2 + 100,
+        y: H / 2 + 160,
         duration: 600,
         ease: 'Back.Out',
       });
     });
 
-    // 재시작 버튼
     this.time.delayedCall(3500, () => {
-      const restartBtn = this.add.text(W / 2, H - 80, '다시 하기 🔄', {
+      const restartBtn = this.add.text(W / 2, H - 120, '다시 하기 🔄', {
         fontSize: '22px',
         color: '#ffffff',
         backgroundColor: '#333344',
@@ -127,9 +120,8 @@ export class RescueScene extends Phaser.Scene {
         this.scene.start('AlchemyScene');
       });
 
-      // 크레딧
-      this.add.text(W / 2, H - 30, '기획/디자인: 딸 ❤️  개발: 아빠 + Claude', {
-        fontSize: '13px',
+      this.add.text(W / 2, H - 50, '기획/디자인: 딸 ❤️  개발: 아빠 + Claude', {
+        fontSize: '12px',
         color: '#888888',
       }).setOrigin(0.5).setDepth(10);
     });

@@ -2,10 +2,10 @@ import Phaser from 'phaser';
 import { CraftingManager, type CraftAction } from '../systems/CraftingManager.js';
 import { StirDetector, CircleStirDetector } from '../utils/gestures.js';
 
-const W = 960;
-const H = 540;
-const CAULDRON_X = 480;
-const CAULDRON_Y = 320;
+const W = 480;
+const H = 854;
+const CAULDRON_X = W / 2;
+const CAULDRON_Y = 400;
 
 export class AlchemyScene extends Phaser.Scene {
   private cm!: CraftingManager;
@@ -33,10 +33,11 @@ export class AlchemyScene extends Phaser.Scene {
     this.stirDetector = new StirDetector(3);
     this.circleDetector = new CircleStirDetector(360);
 
-    this.add.rectangle(W / 2, H / 2, W, H, 0x1a0a2e);
+    this.add.image(W / 2, H / 2, 'bg_alchemy').setDisplaySize(W, H).setDepth(-1);
+    this.add.rectangle(W / 2, H / 2, W, H, 0x000000, 0.35);
 
     this.makeBg();
-    this.add.image(CAULDRON_X, CAULDRON_Y, 'cauldron').setScale(1.2);
+    this.add.image(CAULDRON_X, CAULDRON_Y, 'cauldron').setScale(1.4);
 
     this.buildIngredientSlots();
     this.buildUI();
@@ -45,15 +46,15 @@ export class AlchemyScene extends Phaser.Scene {
   }
 
   private makeBg(): void {
-    // 테이블
-    this.add.rectangle(W / 2, H - 60, W, 120, 0x4a2800);
     // 별
     for (let i = 0; i < 30; i++) {
       const x = Phaser.Math.Between(0, W);
-      const y = Phaser.Math.Between(0, H - 180);
+      const y = Phaser.Math.Between(0, H - 280);
       const r = Phaser.Math.Between(1, 3);
-      this.add.circle(x, y, r, 0xffffff, Phaser.Math.FloatBetween(0.3, 1));
+      this.add.circle(x, y, r, 0xffffff, Phaser.Math.FloatBetween(0.2, 0.7));
     }
+    // 하단 테이블
+    this.add.rectangle(W / 2, H - 90, W, 180, 0x4a2800, 0.7);
   }
 
   private buildIngredientSlots(): void {
@@ -62,17 +63,23 @@ export class AlchemyScene extends Phaser.Scene {
       'ing_water_fruit', 'ing_flame_herb', 'ing_strong_berry',
     ];
     this.ingredients = [];
-    const startX = 80;
-    const spacing = 120;
+
+    // 3×2 그리드: 3열 2행
+    const cols = 3;
+    const cellW = W / cols;
+    const row1Y = H - 150;
+    const row2Y = H - 60;
 
     ids.forEach((id, i) => {
-      const x = startX + i * spacing;
-      const y = H - 90;
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const x = cellW * col + cellW / 2;
+      const y = row === 0 ? row1Y : row2Y;
 
-      const slot = this.add.rectangle(x, y, 64, 64, 0x333355, 0.8).setInteractive();
-      const img = this.add.image(x, y, id).setScale(1).setInteractive({ draggable: true });
-      const label = this.add.text(x, y + 40, this.getIngName(id), {
-        fontSize: '11px', color: '#aaaaaa', align: 'center',
+      const slot = this.add.rectangle(x, y, 56, 56, 0x333355, 0.8).setInteractive();
+      const img = this.add.image(x, y, id).setScale(0.85).setInteractive({ draggable: true });
+      const label = this.add.text(x, y + 32, this.getIngName(id), {
+        fontSize: '10px', color: '#aaaaaa', align: 'center',
       }).setOrigin(0.5);
 
       this.input.setDraggable(img);
@@ -88,36 +95,37 @@ export class AlchemyScene extends Phaser.Scene {
 
   private getIngName(id: string): string {
     const names: Record<string, string> = {
-      ing_floating_leaf: '둥둥잎사귀',
+      ing_floating_leaf: '둥둥잎',
       ing_shinsen_water: '신선물',
       ing_wind_herb: '바람초',
-      ing_water_fruit: '물의열매',
+      ing_water_fruit: '물열매',
       ing_flame_herb: '불꽃초',
-      ing_strong_berry: '튼튼빨간귤',
+      ing_strong_berry: '튼튼귤',
     };
     return names[id] ?? id;
   }
 
   private buildUI(): void {
-    // 단계 패널
-    this.add.rectangle(W / 2, 40, W, 80, 0x000000, 0.5);
-    this.stepText = this.add.text(20, 16, '', { fontSize: '18px', color: '#ffd700' });
-    this.descText = this.add.text(W / 2, 16, '', {
-      fontSize: '16px', color: '#ffffff', align: 'center',
+    // 단계 패널 (상단)
+    this.add.rectangle(W / 2, 40, W, 80, 0x000000, 0.6);
+    this.stepText = this.add.text(16, 14, '', { fontSize: '18px', color: '#ffd700' });
+    this.descText = this.add.text(W / 2, 14, '', {
+      fontSize: '15px', color: '#ffffff', align: 'center',
+      wordWrap: { width: W - 80 },
     }).setOrigin(0.5, 0);
-    this.hintText = this.add.text(W / 2, 44, '', {
-      fontSize: '13px', color: '#88ccff', align: 'center',
+    this.hintText = this.add.text(W / 2, 46, '', {
+      fontSize: '12px', color: '#88ccff', align: 'center',
+      wordWrap: { width: W - 40 },
     }).setOrigin(0.5, 0);
 
     // 재시작 버튼
-    const restartBtn = this.add.text(W - 20, 16, '🔄 재시작', {
-      fontSize: '14px', color: '#ff8888', backgroundColor: '#440000', padding: { x: 8, y: 4 },
+    const restartBtn = this.add.text(W - 12, 14, '🔄', {
+      fontSize: '20px', color: '#ff8888', backgroundColor: '#440000', padding: { x: 6, y: 4 },
     }).setOrigin(1, 0).setInteractive({ useHandCursor: true });
     restartBtn.on('pointerdown', () => this.restartRecipe());
   }
 
   private setupInputHandlers(): void {
-    // 드래그
     this.input.on('dragstart', (_: Phaser.Input.Pointer, obj: Phaser.GameObjects.Image) => {
       this.isDragging = true;
       obj.setDepth(10);
@@ -149,13 +157,13 @@ export class AlchemyScene extends Phaser.Scene {
 
       if (info.action === 'ADD_ITEM' && info.itemId === id) {
         const dist = Phaser.Math.Distance.Between(obj.x, obj.y, CAULDRON_X, CAULDRON_Y);
-        if (dist < 100) {
+        if (dist < 120) {
           this.doAction('ADD_ITEM', id);
         }
       }
 
       if (info.action === 'FILTER_OUT' && info.itemId === id) {
-        if (obj.x < 200 || obj.x > W - 200) {
+        if (obj.x < 160 || obj.x > W - 160) {
           this.doAction('FILTER_OUT', id);
         }
       }
@@ -163,12 +171,10 @@ export class AlchemyScene extends Phaser.Scene {
       this.returnIngredient(obj);
     });
 
-    // 클릭 (CHOP_CRUSH, ADD_DROP_5)
     this.input.on('pointerdown', (ptr: Phaser.Input.Pointer) => {
       const info = this.cm.getStepInfo();
 
       if (info.action === 'ADD_DROP_5' && info.itemId) {
-        // 신선물 슬롯 클릭 → 방울 떨어뜨리기
         const ing = this.findIngredient(info.itemId);
         if (ing) {
           const dist = Phaser.Math.Distance.Between(ptr.x, ptr.y, ing.x, ing.y);
@@ -184,7 +190,6 @@ export class AlchemyScene extends Phaser.Scene {
       }
     });
 
-    // CHOP_CRUSH: 재료 이미지 직접 클릭
     this.ingredients.forEach(img => {
       img.on('pointerdown', () => {
         const info = this.cm.getStepInfo();
@@ -193,7 +198,7 @@ export class AlchemyScene extends Phaser.Scene {
 
         this.chopCount++;
         this.tweens.add({
-          targets: img, scaleX: 0.7, scaleY: 0.7, duration: 80, yoyo: true,
+          targets: img, scaleX: 0.6, scaleY: 0.6, duration: 80, yoyo: true,
         });
 
         if (this.chopCount >= 3) {
@@ -204,7 +209,7 @@ export class AlchemyScene extends Phaser.Scene {
     });
 
     // EXTRACT 버튼
-    const extractBtn = this.add.text(CAULDRON_X, CAULDRON_Y + 120, '💧 추출', {
+    const extractBtn = this.add.text(CAULDRON_X, CAULDRON_Y + 130, '💧 추출', {
       fontSize: '20px', color: '#00ffcc', backgroundColor: '#003322',
       padding: { x: 16, y: 8 },
     }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setVisible(false);
@@ -279,8 +284,8 @@ export class AlchemyScene extends Phaser.Scene {
     this.sound.play('bubble', { volume: 0.6, loop: false });
     this.refreshUI();
 
-    const bar = this.add.rectangle(CAULDRON_X, CAULDRON_Y - 100, 160, 16, 0x003366);
-    const fill = this.add.rectangle(CAULDRON_X - 80, CAULDRON_Y - 100, 0, 14, 0x64c8ff).setOrigin(0, 0.5);
+    const bar = this.add.rectangle(CAULDRON_X, CAULDRON_Y - 120, 160, 16, 0x003366);
+    const fill = this.add.rectangle(CAULDRON_X - 80, CAULDRON_Y - 120, 0, 14, 0x64c8ff).setOrigin(0, 0.5);
 
     this.tweens.add({
       targets: fill,
@@ -291,7 +296,6 @@ export class AlchemyScene extends Phaser.Scene {
         bar.destroy();
         fill.destroy();
         this.isChilling = false;
-        // CHILL 자동 진행
         this.doAction('CHILL');
       },
     });
@@ -314,7 +318,7 @@ export class AlchemyScene extends Phaser.Scene {
   private showFailEffect(): void {
     this.cameras.main.shake(300, 0.01);
     const txt = this.add.text(CAULDRON_X, CAULDRON_Y - 80, '✕ 잘못된 순서!', {
-      fontSize: '24px', color: '#ff4444',
+      fontSize: '22px', color: '#ff4444',
     }).setOrigin(0.5);
     this.tweens.add({
       targets: txt, y: CAULDRON_Y - 140, alpha: 0, duration: 800,
@@ -342,7 +346,7 @@ export class AlchemyScene extends Phaser.Scene {
 
   private refreshUI(): void {
     const info = this.cm.getStepInfo();
-    this.stepText.setText(`${info.step} / ${info.total}`);
+    this.stepText.setText(`${info.step}/${info.total}`);
     this.descText.setText(info.description);
     this.hintText.setText(this.isChilling ? '❄️ ' + info.hint : info.hint);
 
@@ -351,11 +355,10 @@ export class AlchemyScene extends Phaser.Scene {
       extractBtn.setVisible(info.action === 'EXTRACT');
     }
 
-    // 현재 단계 재료 하이라이트
     this.ingredients.forEach(img => {
       const isActive = img.getData('id') === info.itemId;
       img.setAlpha(isActive || !info.itemId ? 1 : 0.5);
-      img.setScale(isActive ? 1.2 : 1);
+      img.setScale(isActive ? 1.0 : 0.85);
     });
   }
 
@@ -379,13 +382,14 @@ export class AlchemyScene extends Phaser.Scene {
     const overlay = this.add.rectangle(W / 2, H / 2, W, H, 0x000000, 0).setDepth(20);
     this.tweens.add({ targets: overlay, alpha: 0.7, duration: 500 });
 
-    this.add.text(W / 2, H / 2 - 60, '🔥 불꽃 돌풍 물약 완성! 🔥', {
+    this.add.text(W / 2, H / 2 - 100, '🔥 불꽃 돌풍\n물약 완성! 🔥', {
       fontSize: '28px', color: '#ff6420', align: 'center',
+      lineSpacing: 8,
     }).setOrigin(0.5).setDepth(21);
 
-    this.add.image(W / 2, H / 2 + 10, 'potion_flame_gale').setScale(2).setDepth(21);
+    this.add.image(W / 2, H / 2 + 20, 'potion_flame_gale').setScale(2.5).setDepth(21);
 
-    const nextBtn = this.add.text(W / 2, H / 2 + 100, '모험 시작 →', {
+    const nextBtn = this.add.text(W / 2, H / 2 + 130, '모험 시작 →', {
       fontSize: '22px', color: '#ffffff', backgroundColor: '#333300',
       padding: { x: 20, y: 10 },
     }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setDepth(21);

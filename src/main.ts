@@ -6,8 +6,8 @@ import { RescueScene } from './scenes/RescueScene.js';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
-  width: 960,
-  height: 540,
+  width: 480,
+  height: 854,
   backgroundColor: '#0a0a1e',
   scale: {
     mode: Phaser.Scale.FIT,
