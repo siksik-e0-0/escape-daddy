@@ -1,0 +1,24 @@
+{
+  "ingredients": [
+    { "id": "ing_floating_leaf", "name": "둥둥잎사귀", "type": "BASE",       "description": "잘게 잘라 찧어 쓰는 기초 재료",          "color": "#7ec850" },
+    { "id": "ing_shinsen_water", "name": "신선물",      "type": "LIQUID",    "description": "5방울 또는 한 바퀴 돌려 넣는 베이스 액체", "color": "#64c8ff" },
+    { "id": "ing_wind_herb",     "name": "바람초",      "type": "CATALYST",  "description": "돌풍의 기운을 담은 촉매",                "color": "#c8f0a0" },
+    { "id": "ing_water_fruit",   "name": "물의열매",    "type": "MODIFIER",  "description": "찧어서 즙을 내는 열매 재료",             "color": "#4096e0" },
+    { "id": "ing_flame_herb",    "name": "불꽃초",      "type": "CORE",      "description": "불꽃 공격을 가능하게 하는 핵심 재료",     "color": "#ff6420" },
+    { "id": "ing_strong_berry",  "name": "튼튼빨간귤",  "type": "STABILIZER","description": "5~6분간 우려내는 안정화 열매",           "color": "#ff3c3c" },
+    { "id": "ing_wing_fruit",    "name": "날개열매",    "type": "MATERIAL",  "description": "날개 모양을 가진 연금술 재료",            "color": "#ffd264" }
+  ],
+  "potions": {
+    "pot_flame_gale": {
+      "id": "pot_flame_gale",
+      "name": "불꽃 돌풍 물약",
+      "effect": "BUFF_FLAME_GALE",
+      "description": "돌풍을 일으키던 바람 대신 강력한 불꽃이 나가게 하는 비약",
+      "color": "#ff4500"
+    }
+  },
+  "timers": {
+    "chill_step8_ms":  10000,
+    "chill_step11_ms":  5000
+  }
+}
