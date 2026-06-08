@@ -19,7 +19,6 @@ export class AlchemyScene extends Phaser.Scene {
   private ingredients!: Phaser.GameObjects.Image[];
   private chopCount = 0;
   private dropCount = 0;
-  private isDragging = false;
   private isChilling = false;
 
   private chillTimer: Phaser.Time.TimerEvent | null = null;
@@ -166,7 +165,6 @@ export class AlchemyScene extends Phaser.Scene {
 
   private setupInputHandlers(): void {
     this.input.on('dragstart', (_: Phaser.Input.Pointer, obj: Phaser.GameObjects.Image) => {
-      this.isDragging = true;
       obj.setDepth(10);
       this.stirDetector.reset();
       this.circleDetector.reset();
@@ -190,7 +188,6 @@ export class AlchemyScene extends Phaser.Scene {
     });
 
     this.input.on('dragend', (_: Phaser.Input.Pointer, obj: Phaser.GameObjects.Image) => {
-      this.isDragging = false;
       const id = obj.getData('id') as string;
       const info = this.cm.getStepInfo();
 
@@ -305,7 +302,7 @@ export class AlchemyScene extends Phaser.Scene {
   }
 
   private advanceStir(): void {
-    if (this.isChilling || this.isDragging) return;
+    if (this.isChilling) return;
     const info = this.cm.getStepInfo();
     if (info.action !== 'STIR') return;
     this.doAction('STIR');
