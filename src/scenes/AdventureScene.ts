@@ -34,8 +34,6 @@ export class AdventureScene extends Phaser.Scene {
     const crafted = this.registry.get('potionCrafted') as boolean | undefined;
     if (crafted) this.weapon.unlock();
 
-    this.add.image(W / 2, H / 2, 'bg_adventure').setDisplaySize(W, H).setDepth(-1);
-
     this.makeTerrain();
     this.makeBarrier();
     this.makePlayer();
@@ -61,23 +59,71 @@ export class AdventureScene extends Phaser.Scene {
   }
 
   private makeTerrain(): void {
-    // 반투명 오버레이로 배경 이미지와 게임 요소 분리
-    this.add.rectangle(W / 2, H / 2, W, H, 0x000000, 0.25);
+    // 밤하늘 배경
+    this.add.rectangle(W / 2, H * 0.3, W, H * 0.6, 0x060d1f);
+    this.add.rectangle(W / 2, H * 0.72, W, H * 0.24, 0x0d1506);
+    this.add.rectangle(W / 2, H * 0.88, W, H * 0.24, 0x1a1000);
+
+    // 별
+    for (let i = 0; i < 50; i++) {
+      const x = Phaser.Math.Between(0, W);
+      const y = Phaser.Math.Between(0, GROUND_Y - 80);
+      const r = Phaser.Math.FloatBetween(0.5, 2);
+      const s = this.add.circle(x, y, r, 0xffffff, Phaser.Math.FloatBetween(0.2, 0.9));
+      this.tweens.add({
+        targets: s, alpha: 0.05,
+        duration: Phaser.Math.Between(800, 2800),
+        yoyo: true, repeat: -1,
+        delay: Phaser.Math.Between(0, 2000),
+      });
+    }
+
+    // 달
+    this.add.circle(60, 80, 38, 0xffffdd, 0.9);
+    this.add.circle(80, 68, 30, 0x060d1f, 0.85); // 초승달
+
+    // 원거리 성 실루엣 (우측 배경)
+    [[340, GROUND_Y - 160, 30, 160], [370, GROUND_Y - 200, 20, 200], [400, GROUND_Y - 140, 28, 140]].forEach(
+      ([x, y, w, h]) => this.add.rectangle(x, y + h / 2, w, h, 0x0d0f1a),
+    );
+    // 성 총안
+    [[326, GROUND_Y - 164], [340, GROUND_Y - 164], [354, GROUND_Y - 164]].forEach(([x, y]) =>
+      this.add.rectangle(x, y, 6, 10, 0x060d1f),
+    );
+
     // 지면
-    this.add.rectangle(W / 2, GROUND_Y + 30, W, 60, 0x3a2800, 0.7);
-    // 발판 (세로 화면 맞게 배치)
+    this.add.rectangle(W / 2, GROUND_Y + 30, W, 60, 0x2a1a00);
+    this.add.rectangle(W / 2, GROUND_Y, W, 6, 0x4a3a10);
+
+    // 발판
     [[100, 600], [240, 520], [380, 600]].forEach(([x, y]) => {
-      this.add.rectangle(x, y, 90, 14, 0x5a4a00);
+      this.add.rectangle(x, y, 90, 14, 0x4a3a10);
+      this.add.rectangle(x, y - 4, 90, 5, 0x7a6a30);
     });
+
     // 나무
-    for (let i = 0; i < 3; i++) {
-      const tx = 80 + i * 170;
-      this.add.rectangle(tx, GROUND_Y - 50, 14, 100, 0x4a2800, 0.8);
-      this.add.circle(tx, GROUND_Y - 110, 32, 0x2a6a2a, 0.8);
+    for (let i = 0; i < 2; i++) {
+      const tx = 80 + i * 150;
+      this.add.rectangle(tx, GROUND_Y - 50, 12, 100, 0x2a1600);
+      this.add.circle(tx, GROUND_Y - 115, 30, 0x0f3a0f);
+      this.add.circle(tx - 10, GROUND_Y - 125, 20, 0x1a5a1a, 0.7);
     }
   }
 
   private makeBarrier(): void {
+    // 아빠 — 장벽 뒤에 갇혀 있음
+    const dad = this.add.image(W - 28, GROUND_Y - 44, 'dad').setScale(1.8).setDepth(1);
+    this.tweens.add({
+      targets: dad, y: GROUND_Y - 52,
+      duration: 1400, yoyo: true, repeat: -1, ease: 'Sine.InOut',
+    });
+
+    // 절망 표시
+    const helpText = this.add.text(W - 28, GROUND_Y - 100, '살려줘!', {
+      fontSize: '11px', color: '#ffaaaa', stroke: '#000', strokeThickness: 2,
+    }).setOrigin(0.5).setDepth(2);
+    this.tweens.add({ targets: helpText, alpha: 0.2, duration: 900, yoyo: true, repeat: -1 });
+
     this.barrier = this.physics.add.staticGroup();
     for (let i = 0; i < 5; i++) {
       const tile = this.barrier.create(BARRIER_X, H / 2 - 200 + i * 100, 'barrier_tile') as Phaser.Physics.Arcade.Image;

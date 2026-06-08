@@ -10,7 +10,6 @@ const INGREDIENT_IDS = [
   'ing_strong_berry',
   'ing_shinsen_water',
   'ing_flame_herb',
-  'ing_wing_fruit',
 ];
 
 export class BootScene extends Phaser.Scene {
@@ -22,9 +21,6 @@ export class BootScene extends Phaser.Scene {
     for (const id of INGREDIENT_IDS) {
       this.load.image(id, `assets/sprites/${id}.png`);
     }
-
-    this.load.image('bg_adventure', 'assets/sprites/bg_adventure.png');
-    this.load.image('bg_alchemy', 'assets/sprites/bg_alchemy.png');
 
     this.load.audio('bubble', 'assets/audio/bubble.ogg');
     this.load.audio('whoosh', 'assets/audio/whoosh.ogg');

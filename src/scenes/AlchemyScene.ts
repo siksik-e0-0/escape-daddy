@@ -33,9 +33,6 @@ export class AlchemyScene extends Phaser.Scene {
     this.stirDetector = new StirDetector(3);
     this.circleDetector = new CircleStirDetector(360);
 
-    this.add.image(W / 2, H / 2, 'bg_alchemy').setDisplaySize(W, H).setDepth(-1);
-    this.add.rectangle(W / 2, H / 2, W, H, 0x000000, 0.35);
-
     this.makeBg();
     this.add.image(CAULDRON_X, CAULDRON_Y, 'cauldron').setScale(1.4);
 
@@ -46,15 +43,57 @@ export class AlchemyScene extends Phaser.Scene {
   }
 
   private makeBg(): void {
-    // 별
-    for (let i = 0; i < 30; i++) {
+    // 하늘 — 밤하늘 그라데이션 레이어
+    this.add.rectangle(W / 2, H * 0.25, W, H * 0.5, 0x060318);
+    this.add.rectangle(W / 2, H * 0.65, W, H * 0.3, 0x0e0820);
+    this.add.rectangle(W / 2, H * 0.88, W, H * 0.24, 0x1a0e06);
+
+    // 별빛
+    for (let i = 0; i < 55; i++) {
       const x = Phaser.Math.Between(0, W);
-      const y = Phaser.Math.Between(0, H - 280);
-      const r = Phaser.Math.Between(1, 3);
-      this.add.circle(x, y, r, 0xffffff, Phaser.Math.FloatBetween(0.2, 0.7));
+      const y = Phaser.Math.Between(10, H - 320);
+      const r = Phaser.Math.FloatBetween(0.5, 2.2);
+      const star = this.add.circle(x, y, r, 0xffffff, Phaser.Math.FloatBetween(0.3, 1));
+      this.tweens.add({
+        targets: star, alpha: 0.05,
+        duration: Phaser.Math.Between(900, 3000),
+        yoyo: true, repeat: -1,
+        delay: Phaser.Math.Between(0, 2500),
+      });
     }
-    // 하단 테이블
-    this.add.rectangle(W / 2, H - 90, W, 180, 0x4a2800, 0.7);
+
+    // 창문 (우상단)
+    this.add.rectangle(W - 60, 90, 80, 100, 0x0a1a3a);
+    this.add.rectangle(W - 60, 90, 82, 102, 0x5a4a30).setDepth(-1);
+    this.add.rectangle(W - 60, 90, 6, 96, 0x5a4a30); // 창틀 세로
+    this.add.rectangle(W - 60, 90, 76, 6, 0x5a4a30); // 창틀 가로
+    // 창문 달빛
+    this.add.circle(W - 38, 62, 18, 0xffffcc, 0.7);
+    this.add.circle(W - 30, 56, 14, 0x0a1a3a, 0.6); // 초승달
+
+    // 선반 (왼쪽)
+    this.add.rectangle(36, H * 0.28, 72, 8, 0x5a3a18);
+    this.add.rectangle(36, H * 0.42, 72, 8, 0x5a3a18);
+    // 선반 병/책
+    [[12, H * 0.27 - 14], [28, H * 0.27 - 18], [44, H * 0.27 - 12]].forEach(([x, y]) => {
+      this.add.rectangle(x, y, 10, 20, Phaser.Math.RND.pick([0x883344, 0x336688, 0x228844]), 0.9);
+    });
+    [[16, H * 0.41 - 16], [36, H * 0.41 - 20]].forEach(([x, y]) => {
+      this.add.circle(x, y, 10, Phaser.Math.RND.pick([0x6633aa, 0x44aa66]), 0.85);
+      this.add.rectangle(x, y - 16, 4, 8, 0x888888, 0.7);
+    });
+
+    // 솥 아래 마법 글로우
+    this.add.circle(CAULDRON_X, CAULDRON_Y + 30, 100, 0x5500bb, 0.18);
+    this.add.circle(CAULDRON_X, CAULDRON_Y + 30, 60, 0x8800ff, 0.12);
+
+    // 하단 작업대
+    this.add.rectangle(W / 2, H - 90, W, 180, 0x3a2000);
+    this.add.rectangle(W / 2, H - 178, W, 5, 0x7a4a15); // 테이블 상단 하이라이트
+    // 작업대 나뭇결
+    for (let i = 0; i < 5; i++) {
+      this.add.rectangle(W / 2, H - 150 + i * 20, W, 1, 0x4a2a08, 0.4);
+    }
   }
 
   private buildIngredientSlots(): void {
