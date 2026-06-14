@@ -1,7 +1,7 @@
 {
-  "name": "escape-daddy",
+  "name": "factory-rise",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,7 +13,6 @@
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^4.1.8",
-    "sharp": "^0.34.5",
     "typescript": "~6.0.2",
     "vite": "^8.0.12",
     "vitest": "^4.1.8"
